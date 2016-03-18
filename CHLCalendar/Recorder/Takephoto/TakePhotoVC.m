@@ -221,21 +221,21 @@
             _takePhotoImg = [UIImage imageWithData:jpegData];
             
 //            NSLog(@"=====%@",_takePhotoImg);
-//            NSLog(@"%f%f",__kScreenWidth,__kScreenHeight);
-//            
-//            CGImageRef imageRef = CGImageCreateWithImageInRect(_takePhotoImg.CGImage, CGRectMake(0, 1920*(200.0/568.0), 1080, (80/568.0)*1920));
-//            UIImage *apartImage = [UIImage imageWithCGImage:imageRef];
-//            
-//            CGImageRelease(imageRef);
+            float imageWidth = _takePhotoImg.size.width;
+            float imageHeight = _takePhotoImg.size.height;
+            
+            CGImageRef imageRef = CGImageCreateWithImageInRect(_takePhotoImg.CGImage, CGRectMake(200/__kScreenHeight*imageHeight, 0, (80/__kScreenHeight)*imageHeight, imageWidth));
+            UIImage *apartImage = [UIImage imageWithCGImage:imageRef scale:1 orientation:UIImageOrientationRight];
+            CGImageRelease(imageRef);
             
             //选择结果
             if ([paperStyleStr isEqualToString:@"HCGpaper"]) {
                 HCGResultVC *hcgResult = [[HCGResultVC alloc]init];
-                hcgResult.resultImage = _takePhotoImg;
+                hcgResult.resultImage = apartImage;
                 [self.navigationController pushViewController:hcgResult animated:YES];
             }else{
                 TextResultVC *textResult = [[TextResultVC alloc]init];
-                textResult.resultImage = _takePhotoImg;
+                textResult.resultImage = apartImage;
                 [self.navigationController pushViewController:textResult animated:YES];
             }
         }];
