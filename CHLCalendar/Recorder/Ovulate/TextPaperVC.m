@@ -14,6 +14,7 @@
 #import "GPUImageColorInvertFilter.h"
 #import "GPUImagePicture.h"
 #import "TakePhotoVC.h"
+#import "DeleteTextPaperVC.h"
 
 @interface TextPaperVC ()<UIActionSheetDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate,UIAlertViewDelegate,PhotoTweaksViewControllerDelegate,GetTextResultDelegate,UITableViewDataSource,UITableViewDelegate>
 {
@@ -51,6 +52,8 @@
     [self createNavView];
     [self createBottomCamera];
     [self cameraEdit];
+    [self changeTextValue];
+    [self deleteTextValue];
 }
 
 #pragma mark ============== 创建tableView
@@ -299,6 +302,55 @@
 }
 
 
+#pragma mark ===================== 改变选择结果
+- (void)changeTextValue
+{
+    NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+    [notify addObserver:self selector:@selector(changeResult:) name:@"changeTextPaper" object:nil];
+}
+
+- (void)changeResult:(NSNotification *)sender
+{
+    NSDictionary *userInfo = [sender userInfo];
+    NSString *time = [userInfo objectForKey:@"time"];
+    NSString *value = [userInfo objectForKey:@"value"];
+    NSString *textId = [userInfo objectForKey:@"textId"];
+    
+    NSInteger idNum = [textId integerValue];
+    [_dataValueArray replaceObjectAtIndex:idNum withObject:value];
+    [_dataTimeArray replaceObjectAtIndex:idNum withObject:time];
+    
+    _tableStyle = YES;
+    
+    [_tableView reloadData];
+}
+
+#pragma mark ===================== 删除
+- (void)deleteTextValue
+{
+    NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+    [notify addObserver:self selector:@selector(deleteResult:) name:@"deleteTextPaper" object:nil];
+}
+
+- (void)deleteResult:(NSNotification *)sender
+{
+    NSDictionary *userInfo = [sender userInfo];
+    NSString *textId = [userInfo objectForKey:@"textId"];
+    NSInteger idNum = [textId integerValue];
+    
+    [_dataTimeArray removeObjectAtIndex:idNum];
+    [_dataValueArray removeObjectAtIndex:idNum];
+    [_dataImgArray removeObjectAtIndex:idNum];
+    
+    if (_dataImgArray.count == 0) {
+        _tableStyle = NO;
+    }else{
+        _tableStyle = YES;
+    }
+    
+    [_tableView reloadData];
+}
+
 #pragma mark =========== tabelView的协议方法
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -343,7 +395,17 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"选中cell");
+    //时间
+    NSString *dateStr = _dataTimeArray[indexPath.row];
+    //图片
+    UIImage *image = _dataImgArray[indexPath.row];
+    
+    DeleteTextPaperVC *delete = [[DeleteTextPaperVC alloc]init];
+    delete.textImage = image;
+    delete.textResult = _dataValueArray[indexPath.row];
+    delete.textTime = dateStr;
+    delete.textId = indexPath.row;
+    [self.navigationController pushViewController:delete animated:YES];
 }
 
 #pragma mark ======================== 反色

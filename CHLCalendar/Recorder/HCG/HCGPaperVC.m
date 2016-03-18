@@ -11,6 +11,7 @@
 #import "HCGResultVC.h"
 #import "TextPaperCell.h"
 #import "TakePhotoVC.h"
+#import "DeleteHCGPaperVC.h"
 #import "GPUImage.h"
 #import "GPUImageColorInvertFilter.h"
 #import "GPUImagePicture.h"
@@ -50,6 +51,8 @@
     [self createNavView];
     [self createBottomCamera];
     [self HCGcameraEdit];
+    [self changeHCGTextValue];
+    [self deleteHCGTextValue];
 }
 
 #pragma mark ============== 创建tableView
@@ -297,6 +300,55 @@
     [_tableView reloadData];
 }
 
+#pragma mark ===================== 改变选择结果
+- (void)changeHCGTextValue
+{
+    NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+    [notify addObserver:self selector:@selector(changeHCGResult:) name:@"changeHCGTextPaper" object:nil];
+}
+
+- (void)changeHCGResult:(NSNotification *)sender
+{
+    NSDictionary *userInfo = [sender userInfo];
+    NSString *time = [userInfo objectForKey:@"time"];
+    NSString *value = [userInfo objectForKey:@"value"];
+    NSString *textId = [userInfo objectForKey:@"textId"];
+    
+    NSInteger idNum = [textId integerValue];
+    [_dataValueArray replaceObjectAtIndex:idNum withObject:value];
+    [_dataTimeArray replaceObjectAtIndex:idNum withObject:time];
+    
+    _tableStyle = YES;
+    
+    [_tableView reloadData];
+}
+
+#pragma mark ===================== 删除
+- (void)deleteHCGTextValue
+{
+    NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+    [notify addObserver:self selector:@selector(deleteHCGResult:) name:@"deleteHCGTextPaper" object:nil];
+}
+
+- (void)deleteHCGResult:(NSNotification *)sender
+{
+    NSDictionary *userInfo = [sender userInfo];
+    NSString *textId = [userInfo objectForKey:@"textId"];
+    NSInteger idNum = [textId integerValue];
+    
+    [_dataTimeArray removeObjectAtIndex:idNum];
+    [_dataValueArray removeObjectAtIndex:idNum];
+    [_dataImgArray removeObjectAtIndex:idNum];
+    
+    if (_dataImgArray.count == 0) {
+        _tableStyle = NO;
+    }else{
+        _tableStyle = YES;
+    }
+    
+    [_tableView reloadData];
+}
+
 
 #pragma mark =========== tabelView的协议方法
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -342,7 +394,17 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"选中cell");
+    //时间
+    NSString *dateStr = _dataTimeArray[indexPath.row];
+    //图片
+    UIImage *image = _dataImgArray[indexPath.row];
+    
+    DeleteHCGPaperVC *delete = [[DeleteHCGPaperVC alloc]init];
+    delete.textImage = image;
+    delete.textResult = _dataValueArray[indexPath.row];
+    delete.textTime = dateStr;
+    delete.textId = indexPath.row;
+    [self.navigationController pushViewController:delete animated:YES];
 }
 
 #pragma mark ======================== 反色

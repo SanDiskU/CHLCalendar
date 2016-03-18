@@ -161,7 +161,7 @@ static NSInteger const MonthCount = 6;
             if ([ovulateStr isEqualToString:todayStr]) {
                 [calendarItem setTitleColor:pailuanColor forState:UIControlStateNormal];
                 
-                UIImageView *ovulateImageView = [[UIImageView alloc]initWithFrame:CGRectMake(itemW/3.0, itemH/3.0*2, itemW/3.0, itemW/3.0)];
+                UIImageView *ovulateImageView = [[UIImageView alloc]initWithFrame:CGRectMake(itemW/3.0*2, itemH/4.0*3, itemW/4.0, itemW/4.0)];
                 ovulateImageView.image = [[UIImage imageNamed:@"shixing"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
                 ovulateImageView.backgroundColor = [UIColor clearColor];
                 [calendarItem addSubview:ovulateImageView];
@@ -190,7 +190,7 @@ static NSInteger const MonthCount = 6;
 //            calendarItem.layer.borderWidth = 0.5;
 //            calendarItem.layer.borderColor = [UIColor redColor].CGColor;
             
-            UILabel *todayLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, itemH/3.0*2, itemW, itemW/3.0)];
+            UILabel *todayLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, itemH/4.0*3, itemW/3.0*2, itemW/4.0)];
             todayLabel.text = @"今天";
             todayLabel.font = [UIFont systemFontOfSize:10];
             todayLabel.textAlignment = 1;
